@@ -1,0 +1,24 @@
+{% extends "account/email/base_message.txt" %}
+
+{% block message_heading %}
+You are signed up!
+{% endblock message_heading %}
+
+{% block message_image %}
+https://d21lgi9wqi51u3.cloudfront.net/img/confirm_email_1x.png
+{% endblock message_image %}
+
+{% block message_content %}
+Good news! You are already signed up to achieve the next level of document management and insights. However, if you do not recollect your password you can use the reset link below to recover your account.
+{% endblock message_content %}
+
+{% block message_action %}
+<a href="{{ password_reset_url }}" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:18px;padding:10px 20px 10px 20px;display:inline-block;background:#0c3d7b;border-radius:6px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:22px;width:auto;text-align:center;mso-padding-alt:0;mso-border-alt:10px solid #0C3D7B;padding-left:30px;padding-right:30px">Reset Password</a>
+{% endblock message_action %}
+
+{% block message_tail_content %}
+This link will expire in 24 hours.<br>If you have questions,&nbsp;<a href="https://help.dokumint.ai" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#0c3d7b;font-size:14px">we’re here to help</a>.
+{% endblock message_tail_content %}
+
+{% block message_online_link %}
+{% endblock message_online_link %}

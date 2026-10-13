@@ -1,0 +1,31 @@
+<div class="row line-item-row show-on-hover" id="expense-line-item-{{ line_item.id }}">
+    <div class="col-9">
+        <div class="row">
+            <div class="col-12 col-md-9 line-item-description text-truncate">
+                {{ line_item.description|default:"Not identifed" }}
+            </div>
+            <div class="col-12 col-md-3 line-item-quantity">
+                x {{ line_item.quantity|default:"0.0" }}
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="row">
+            <div class="col-12 col-md-8">
+                <span class="float-end line-item-total">
+                    $ {{ line_item.total|default_if_none:"0.0" }}
+                </span>
+            </div>
+            <div class="col-12 col-md-4">
+                <span class="float-end line-item-edit-btns" formaction="{% url 'core:document-line-item-update-api' document_id line_item.id %}">
+                    <i class="bi bi-pencil-square text-primary edit-line-item-btn" data-bs-toggle="modal"
+                    data-bs-target="#edit-line-item-modal"></i>
+                    &nbsp;
+                    <i class="bi bi-trash3 text-danger delete-line-item-btn" data-bs-toggle="modal"
+                    data-bs-target="#edit-line-item-modal"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<hr id="hr-{{ line_item.id }}">

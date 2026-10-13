@@ -1,0 +1,36 @@
+/* Loading Spinner */
+.blocking-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: lightgray;
+    opacity: 30%;
+}
+.spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -20px;
+    margin-left: -25px;
+    height: 4rem;
+    width: 4rem;
+    text-align: center;
+}
+
+/* Show on hover */
+.row.show-on-hover i.bi-pencil-square, .row.show-on-hover i.bi-trash3 {
+    display: none;
+  }
+  
+.row.show-on-hover:hover i.bi-pencil-square, .row.show-on-hover:hover i.bi-trash3 {
+    display: inline-block;
+}
+
+/* Navigation Header elements */
+.nav-divider {
+    height: 2rem;
+    border-left: .1rem solid rgba(0,34,28,.1);
+    margin: 0 .5rem;
+  }

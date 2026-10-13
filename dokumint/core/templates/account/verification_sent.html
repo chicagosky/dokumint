@@ -1,0 +1,32 @@
+{% extends "account/auth_base.html" %}
+{% load static %}
+
+{% block title %}
+dokumint.ai - Register or Login with your account
+{% endblock title %}
+
+{% block auth-form-title %}
+Email Verification Required
+{% endblock auth-form-title %}
+
+{% block auth-form-content %}
+<div class="row mt-3">
+  <div class="col-12">
+    <p>Welcome to dokumint. To get you started, we just need to confirm that you are
+      you!</p>
+
+    <p>You should receive an email at the address provided in a few minutes. Please click on the verification link in
+      the email to complete the signup process.</p>
+
+    <p>If you do not receive the verification email within an hour, please check your spam folder or contact us for
+      assistance</p>
+  </div>
+</div>
+
+<div class="row mt-3">
+  <div class="col-12 text-center">
+    <p>Don't have an account yet? <a href="/signup">Sign Up</a></p>
+    <p>Already have an account? <a href="/login">Log In</a></p>
+  </div>
+</div>
+{% endblock auth-form-content %}

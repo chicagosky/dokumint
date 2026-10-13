@@ -1,0 +1,1 @@
+aws s3 rb s3://bucket_name --force

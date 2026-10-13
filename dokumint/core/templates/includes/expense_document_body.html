@@ -1,0 +1,133 @@
+{% load static %}
+{% load document_tags %}
+
+<div class="container mt-1 mt-3 mb-3" id="expense-document-body">
+    <!-- Overall layout is formatted as two columns. The first column contains document details 
+     Second column contains document options such as sub-type, tags etc. -->
+    <div class="row">
+        <!-- First Column - Document details -->
+        <div class="col-12 col-md-9">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 text-truncate">
+                            <span class="text-black" style="font-size: 30px;" id="summary-creator-name">
+                                {{ document.creator.name }}
+                            </span>
+                            &nbsp;&nbsp;
+                            <div class="d-block d-md-inline">
+                                {% document_favorite document %}
+                                &nbsp;&nbsp;
+                                <span class="badge text-bg-{{ document.review_status|yesno:'primary,secondary' }}"
+                                    id="badge-review-status">
+                                    {{ document.review_status|yesno:'Reviewed,Pending Review' }}</span>
+                                &nbsp;&nbsp;
+                                <span>
+                                    <a class="image-link" href="{% url 'core:document-image' document.id %}"
+                                        image-link="{% url 'core:document-image' document.id %}"
+                                        data-bs-toggle="tooltip" data-bs-title="Document Image"
+                                        data-bs-placement="bottom">
+                                        <i class="bi bi-receipt"></i></a>
+                                </span>
+                                &nbsp;&nbsp;
+                                <span data-bs-toggle="tooltip" data-bs-title="Edit Document Summary"
+                                    data-bs-placement="bottom">
+                                    <i class="bi bi-pencil-square edit-document-summary-btn" data-bs-toggle="modal"
+                                        data-bs-target="#edit-document-summary-modal"></i>
+                                </span>
+                                &nbsp;&nbsp;
+                                <span data-bs-toggle="tooltip" data-bs-title="Delete Document"
+                                    data-bs-placement="bottom">
+                                    <i class="bi bi-trash3 text-danger delete-document-btn" data-bs-toggle="modal"
+                                        data-bs-target="#confirm-delete-document-modal"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        {% for address in document.addresses.all %}
+                        {% document_address address %}
+                        {% endfor %}
+                    </div>
+                    <div class="row">
+                        {% document_dates document.dates %}
+                    </div>
+
+                    <hr />
+
+                    {% for line_item in document.expense_line_items.all %}
+                    {% expense_line_items line_item %}
+                    {% if forloop.last %}
+                    <div class="row" id="add-line-item-row">
+                        <button type="button" class="btn btn-light add-line-item-btn" data-bs-toggle="modal"
+                            data-bs-target="#edit-line-item-modal" formaction="{% url 'core:document-line-item-add-api' document.id %}">
+                            <i class="bi bi-plus-circle"></i> Add Row</button>
+                    </div>
+                    <hr style="border: 2px solid black;" />
+                    {% endif %}
+                    {% endfor %}
+
+                    <div class="row text-black show-on-hover">
+                        <div class="col-lg-11">
+                            <p class="float-end fw-bold">
+                                Tax: $ <span id="summary-total-tax-amt">{{ document.tax_line_items.tax_total }}</span>
+                            </p>
+                        </div>
+                        <div class="col-lg-1"></div>
+                    </div>
+                    <hr style="border: 2px solid black;" />
+                    <div class="row text-black show-on-hover">
+                        <div class="col-lg-11">
+                            <p class="float-end fw-bold">
+                                Total: $ <span id="summary-total-amt">{{ document.financials.total }}</span>
+                            </p>
+                        </div>
+                        <div class="col-lg-1"></div>
+                    </div>
+                    <hr style="border: 2px solid black;" />
+
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-3">Mark as reviewed:</div>
+                        <div class="col-12 col-sm-12 col-md-9 col-lg-9 form-switch">
+                            <input class="form-check-input" style="margin-left: -1.5em;" type="checkbox"
+                                id="review-status" formaction="{% url 'core:toggle-document-review-api' document.id %}" 
+                                {{ document.review_status|yesno:'checked,' }} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Second Column - Document options -->
+        <div class="col-md-3">
+            <!-- Receipt Tags -->
+            <div class='card shadow mb-4'>
+                <div class='card-body'>
+                    <div class='row mt-3'>
+                        <div class='col-12'>
+                            <h5>Tags</h5>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12" id="current-tags">
+                            {% for tag in document.tags.all %}
+                            <span class="badge text-bg-secondary" id="tag-{{ tag.id }}">
+                                {{ tag.text }}&nbsp;
+                                <a href="#" style="text-decoration: none;" class="remove-tag text-light" formaction="{% url 'core:document-tag-api' document.id tag.id %}">x</a>
+                            </span>
+                            {% endfor%}
+
+                        </div>
+                    </div>
+                    <form id="add-tag-form">
+                        <input type="hidden" id="document-id" value="{{ document.id }}" />
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <input type="text" class="form-control" id="tag-text" placeholder="Enter tag and press enter" formaction="{% url 'core:document-tag-api' document.id 0 %}">              
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

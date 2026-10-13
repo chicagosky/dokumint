@@ -1,0 +1,104 @@
+<div class='row mb-2'>
+    <div class='col-12'>
+        <span class="text-black h4" >Communication Preferences</span>
+    </div>
+</div>
+
+<div class='card shadow mb-4'>
+    <div class='card-body'>
+        <div class='container user-preferences'>
+            <div class='row'>
+                <div class="col-1">
+                    <i class="bi bi-signpost-2-fill"></i>
+                </div>
+                <div class="col-11">
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <span class="h5 d-inline">Email Relay: </span>
+                            <span data-bs-toggle="tooltip" data-bs-title="New features, product updates etc." data-bs-placement="bottom">
+                                <i class="bi bi-info-circle-fill"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="col-12">
+                                {{ profile.email_relay|default:"undefined" }}@dokumint.ai &nbsp;&nbsp;
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#change-email-relay-modal">
+                                    Change relay username
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class='row'>
+                <div class="col-1">
+                    <i class="bi bi-envelope-exclamation-fill"></i>
+                </div>
+                <div class="col-11">
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <span class="h5 d-inline">Account Update Emails allowed: </span>
+                            <span data-bs-toggle="tooltip" data-bs-title="Password reset etc." data-bs-placement="bottom">
+                                <i class="bi bi-info-circle-fill"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 form-switch">
+                            <input class='form-check-input' style='margin-left: -1.5em;' type='checkbox' checked disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class='row'>
+                <div class="col-1">
+                    <i class="bi bi-envelope-slash-fill"></i>
+                </div>
+                <div class="col-11">
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <span class="h5 d-inline">Monthly Update Emails allowed: </span>
+                            <span data-bs-toggle="tooltip" data-bs-title="New features, product updates etc." data-bs-placement="bottom">
+                                <i class="bi bi-info-circle-fill"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 form-switch">
+                            <input class="form-check-input" style="margin-left: -1.5em;" type="checkbox"
+                                id="notifications-allowed" formaction="{% url 'core:profile-detail-api' user.id %}" 
+                                {{ user.profile.notifications_allowed|yesno:'checked,' }} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class='row'>
+                <div class="col-1">
+                    <i class="bi bi-bar-chart-fill"></i>
+                </div>
+                <div class="col-11">
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <span class="h5 d-inline">Aggregated analytics allowed: </span>
+                            <span data-bs-toggle="tooltip" data-bs-title="Analyze anonymized data at the zipcode level" data-bs-placement="bottom">
+                                <i class="bi bi-info-circle-fill"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 form-switch">
+                            <input class="form-check-input" style="margin-left: -1.5em;" type="checkbox"
+                                id="analytics-allowed" formaction="{% url 'core:profile-detail-api' user.id %}" 
+                                {{ user.profile.analytics_allowed|yesno:'checked,' }} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

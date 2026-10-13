@@ -1,0 +1,77 @@
+{% extends "account/auth_base.html" %}
+{% load static %}
+
+{% block title %}
+Itomize - Sign Up
+{% endblock title %}
+
+{% block auth-form-title %}
+Sign Up
+{% endblock auth-form-title %}
+
+{% block auth-form-content %}
+<form method="POST" action="/signup/">
+    {% csrf_token %}
+    <div class="row mt-3">
+        <div class="col-12">
+            <label for="email">Email address</label>
+            <input type="email" class="form-control" id="email" name="email"
+                placeholder="name@example.com">
+            {% if form.email.errors %}
+            <div class="text-danger"><small>{{ form.email.errors.as_text }}</small></div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-12">
+            <label for="password1">
+                Password
+                <a id="password-rules" data-bs-toggle="popover" data-bs-title="Popover title"
+                    data-bs-content="Popover" data-trigger="hover">
+                    <i class="bi bi-info-circle-fill"></i>
+                </a>
+            </label>
+            <input type="password" class="form-control" id="password1" name="password1"
+                placeholder="Password" />
+            {% if form.password1.errors %}
+            <div class="text-danger"><small>{{ form.password1.errors.as_text }}</small></div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-12">
+            <label for="password2">Password (repeat)</label>
+            <input type="password" class="form-control" id="password2" name="password2"
+                placeholder="Password">
+            {% if form.password2.errors %}
+            <div class="text-danger"><small>{{ form.password2.errors.as_text }}</small></div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-12">
+            <button class="btn btn-primary w-100 py-2" type="submit">Sign up</button>
+        </div>
+    </div>
+</form>
+
+{% include "includes/auth_actions.html"  with login="Y" forgot="Y" %}
+<hr>
+{% include "includes/google_oauth_button.html" with action="up" %}
+
+{% endblock auth-form-content %}
+
+{% block javascript %}
+<script type="text/javascript">
+    const passwordRules =
+        "1. Password must be at least 8 characters in length \n" +
+        "2. Password must be a combination of numbers and letters";
+    $("#password-rules").attr("data-bs-title", "Password Rules");
+    $("#password-rules").attr("data-bs-content", passwordRules);
+
+    // adding a delay timer per https://stackoverflow.com/a/71605421/776543
+    setTimeout((function () {
+        $('[data-bs-toggle="popover"]').popover();
+    }), 500);
+</script>
+{% endblock javascript %}

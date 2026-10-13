@@ -1,0 +1,7 @@
+<span class="favorite" formaction="{% url 'core:toggle-document-favorite-api' id %}" document="{{ id }}">
+    {% if favorited == False %}
+    <i class="bi bi-star"></i>
+    {% else %}
+    <i class="bi bi-star-fill"></i>
+    {% endif %}
+</span>

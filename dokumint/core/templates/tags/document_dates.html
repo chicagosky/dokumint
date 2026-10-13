@@ -1,0 +1,8 @@
+{% for name,value in dates.items %}
+    {% if value is not None %}
+    <div class="col-12 col-md-3 mt-3">
+        <div class="text-truncate"><strong>{{ name }}</strong></div>
+        <div>{{ value }}</div>
+    </div>
+    {% endif %}
+{% endfor %}

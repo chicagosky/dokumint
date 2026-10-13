@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Account Profile
+{% endblock title %}
+
+{% block extra_js_lib %}
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script src="{% static 'js/profile_charts.js' %}" type="text/javascript"></script>
+{% endblock extra_js_lib %}
+
+{% block content %}
+<!-- System messages & Validation error messages -->
+{% if messages %}
+<div class="container mt-3">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-9">
+      <div class="card shadow mb-2">
+        <div class="card-body bg-warning">
+          {% for message in messages %}
+          <div class="row">
+            <div class="col-12 text-light">
+              <p>{{ message }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>    
+      </div>    
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class='container mt-3 mb-3'>
+    <div class="row justify-content-center">
+        <!-- REST Error display -->
+        <div class="col-12 col-md-9" id="display-errors">
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-9">
+            <h2>Account Profile</h2>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-9">
+            <!-- Personal Information Card -->
+            {% include "includes/profile/profile_personal_info.html" %}
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-9">
+            <!-- Preferences -->
+            {% include "includes/profile/profile_comm_preferences.html" %}
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-9">
+            <!-- Preferences -->
+            {% include "includes/profile/profile_other_settings.html" %}
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="edit-profile-modal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Edit Personal Information</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'core:account-profile' user.id %}">
+            <div class="modal-body mx-3">
+                {% csrf_token %}
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <label for="first-name">First Name:</label>
+                        <input type="text" class="form-control" id="first-name" name="first_name" value="{{ user.first_name }}" required>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <label for="last-name">Last Name:</label>
+                        <input type="text" class="form-control" id="last-name" name="last_name" value="{{ user.last_name }}" required>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <label for="email">E-mail:</label>
+                        <input type="text" class="form-control" id="email" value="{{ user.email }}" disabled>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <label for="postal-code">Zipcode:</label>
+                        <input type="text" class="form-control" id="postal-code" name="postal_code" value="{{ user.profile.postal_code}}" required>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x"></i>&nbsp;&nbsp;Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" id="confirm-delete-receipt-btn">
+                    <i class="bi bi-floppy"></i>&nbsp;&nbsp;Save
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="change-password-modal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Change Password</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'core:account-change-password' %}">
+            <div class="modal-body mx-3">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="oldpassword">Current password:</label>
+                            <input type="password" class="form-control" id="oldpassword" name="oldpassword" required>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <label for="password1">New password:</label>
+                            <input type="password" class="form-control" id="password1" name="password1" required>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <label for="password2">Re-enter new password:</label>
+                            <input type="password" class="form-control" id="password2" name="password2" required>
+                        </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x"></i>&nbsp;&nbsp;Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" id="confirm-delete-receipt-btn">
+                    <i class="bi bi-floppy"></i>&nbsp;&nbsp;Change
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Change Email Relay Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="change-email-relay-modal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Change Email Relay Username</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'core:account-profile' user.id %}">
+            <div class="modal-body mx-3">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="current-email-relay">Current Username:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="current-email-relay" value="{{ profile.email_relay|default:'undefined' }}"  disabled>
+                                <span class="input-group-text" id="current-user-name-addon">@dokumint.ai</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <label for="new-email-relay">New Username:</label> 
+                            <span data-bs-toggle="tooltip" data-bs-title="Must be minimum of 6 characters long. Must comprise of alphabets or numbers. Special characters _ and . are allowed" data-bs-placement="top">
+                                <i class="bi bi-info-circle-fill"></i>
+                            </span>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="New username" id="new-email-relay" name="email_relay" required>
+                                <span class="input-group-text" id="new-user-name-addon">@dokumint.ai</span>
+                            </div>
+                            <div id="email-relay-available" class="mt-2"></div>
+                        </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x"></i>&nbsp;&nbsp;Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" id="confirm-delete-receipt-btn">
+                    <i class="bi bi-floppy"></i>&nbsp;&nbsp;Change
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+<script type="text/javascript">
+const mainBodyElement = $('.main-body');
+
+// Bind event to save notifications allowed toggle switch
+$('body').on('change', '#notifications-allowed', function(event) {
+    clearErrors(mainBodyElement);
+    event.data = getFormData($(event.currentTarget), csrfToken);
+    if (event.data) { // If false then no edits were made
+        event.onSuccess = 'doNothing';
+        event.errorPanel = mainBodyElement;
+        event.method = 'PUT';
+        event.url = $(event.currentTarget).attr('formaction');
+        saveEditedData(event);
+    }
+});
+
+// Bind event to save notifications allowed toggle switch
+$('body').on('change', '#analytics-allowed', function(event) {
+    clearErrors(mainBodyElement);
+    event.data = getFormData($(event.currentTarget), csrfToken);
+    if (event.data) { // If false then no edits were made
+        event.onSuccess = 'doNothing';
+        event.errorPanel = mainBodyElement;
+        event.method = 'PUT';
+        event.url = $(event.currentTarget).attr('formaction');
+        saveEditedData(event);
+    }
+});
+
+// Process user creating new tag by listening for enter key
+let _timeout = null;
+let _minLength = 6;
+$('input#new-email-relay').on('keyup',function(event) {
+    clearTimeout(_timeout);
+
+    let value = $(this).val();
+    if (value.length >= _minLength) {
+        _url = '/api/email-relay/' + value;
+        _timeout = setTimeout(function(){
+            $.ajax({
+                type: 'GET',
+                url: _url,
+                success: function(response) {
+                    if (!response['available']) {
+                        $('#email-relay-available').removeClass('text-success').html('');
+                        $('#email-relay-available').addClass('text-danger').html('Username is not available');
+                    } else {
+                        $('#email-relay-available').removeClass('text-danger').html('');
+                        $('#email-relay-available').addClass('text-success').html('Username is available');
+                    }
+                    
+                }
+            });
+        }, 1000);
+    }
+});
+</script>
+{% endblock javascript %}

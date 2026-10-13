@@ -1,0 +1,124 @@
+# 1. SSH to remote server
+# e.g. ssh -i "certificate.pem" ec2-user@ec2-example.compute.amazonaws.com
+ssh -i <certificate.pem> <user>@<public dns entry>
+
+# Amazon Linux 2023  only includes Python 3.9 by default and not even Pip
+# Read thread at https://stackoverflow.com/a/77733120/776543
+# 2. Install Python 3.11 and Pip 3.11 
+sudo dnf install python3.11 -y
+sudo dnf install python3.11-pip -y
+
+# Amazon Linux 2023 does not include mysqlclient by default
+# mysqlclient needs to be downloaded and compiled
+# 3. Install these pre-requisites before install mysqlclient
+sudo dnf install -y gcc 
+sudo dnf install -y mariadb105-devel
+sudo dnf install python3.11-devel
+
+# Github.com CLI makes it very easy to deploy and connect to github
+# Install Github CLI as per https://medium.com/@olayinkasamuel44/how-to-install-and-start-gh-on-amazon-linux-2-8f8b4e81aa6a
+# 4. Install dnf-utils
+sudo dnf install dnf-utils -y
+
+# Read more about add repos at https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/deployment_guide/sec-managing_yum_repositories and https://www.makeuseof.com/how-to-install-github-cli-on-linux/
+# 5. Download the latest GH CLI repo
+sudo dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
+
+# 6. Install GH CLI from downloaded repo and update
+sudo dnf install gh -y 
+sudo dnf update gh
+
+# 7. Authenticate with GH CLI and follow prompts
+gh auth login
+
+# 8. Clone project repo into remote directory
+gh repo clone chicagosky/dokumint
+
+# 9. Create directory for static files and modify permissions
+mkdir ~/www
+chmod -R 775 www
+
+# 10. Create python virtual environment in project directory
+cd ~/dokumint
+python3.11 -m venv .venv
+
+# 11. Change permissions of activate file and activate virtual environment
+chmod 744 .venv/bin/activate 
+source .venv/bin/activate 
+
+# 12. Install project dependencies from requirements.txt
+pip install -r requirements.txt
+
+# mysqlclient is not part of requirements.txt due to dependencies on step 3. Hence it needs to be installed separately
+# 13. Install mysqlclient
+pip install mysqlclient
+
+# Environment file needs to be created  for each environment separately
+# 14. Create .env file and change permissions
+nano ~/dokumint/.env
+
+# Edit environment file per instructions in file
+
+# 15. Create log file directory
+mkdir ~dokumint/dokumint/logs
+chmod 775 ~dokumint/dokumint/logs
+
+# 16. Install Gunicorn webserver
+pip install gunicorn
+
+# 17. Install Nginx webserver to act as reverse proxy server
+sudo dnf install nginx
+
+# To install SSL certificate with Nginx, follow - https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/
+# 18. Download Letsencrypt client
+sudo dnf install certbot -y 
+sudo dnf install python3-certbot-nginx -y 
+
+# Make an application specific copy of Nginx conf file and modify 
+# 19. Make a copy of Nginx conf file
+sudo cp /etc/nginx/nginx.conf /etc/nginx/dokumint-nginx.conf
+
+# 20. Edit Nginx conf file
+sudo nano /etc/nginx/nginx.conf
+
+# Follow instructions in file to make changes
+# 21. Test Nginx configuration file and fix any errors
+sudo nginx -t 
+
+# This step will also modify the nginx.conf file to specify certificate and SSL configuration
+# e.g. sudo certbot --nginx -d example.com
+# 22. Obtain SSL certificate from Letsencrypt
+sudo certbot --nginx -d <certificate DNS name>
+
+# Since we changed the username of nginx configuration file
+# we'll need to change the permissions of nginx temp folders as well 
+# 23. Change permissions of nginx temp folders
+sudo chmod 775 -R /var/lib/nginx
+
+# Amazon Linux does not have a cron scheduler so we'll need to install one 
+# 24. Install cronie 
+sudo dnf install cronie -y
+
+
+#24. Add a cron job to check if SSL certificate requires renewal every 30 days
+crontab -e
+# Insert below line in crontab file
+0 12 * * * /usr/bin/certbot renew --quiet
+
+# It is better to run Gunicorn as a system service, so we'll need to create a systemd service unit file
+# https://dev.to/tkirwa/create-a-systemd-service-script-for-running-gunicorn-to-serve-your-application-5aea
+# https://stackoverflow.com/a/30503078/776543
+# You can check current daemons with ps ax | grep gunicorn
+# Kill activate gunicorn daemons with pkill gunicorn
+# 25. Run Gunicorn as daemon thread (MUST BE IN ACTIVE venv)
+gunicorn dokumint.wsgi:application --name dokumint --workers 3 --user=ec2-user --group=ec2-user --bind=127.0.0.1:8000 --daemon
+
+# 26. Start nginx server
+# If nginx is already running you may get port is already in use errors
+# Then reload nginx server with sudo nginx -s reload
+sudo nginx
+
+# 27. Collect static files in Django
+cd /home/ec2-user/dokumint
+python manage.py collectstatic --noinput
+

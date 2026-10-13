@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% load document_tags %}
+
+{% block title %}
+dokumint.ai - List of Documents
+{% endblock %}
+
+{% block content %}
+<!-- System messages & Validation error messages -->
+{% if messages or form.errors.upload_file %}
+<div class="container mt-3">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-9">
+      <div class="card shadow mb-2">
+        <div class="card-body">
+          {% for message in messages %}
+          <div class="row">
+            <div class="col-12 text-{{ message.level_tag }}">
+              <p>{{ message }}</p>
+            </div>
+          </div>
+          {% endfor %}
+          {% if form.errors.upload_file %}
+          <div class="row">
+            <div class="col-12 text-light">
+              <small>Upload File: {{ form.errors.upload_file.as_text }}</small>
+            </div>
+          </div>
+          {% endif %}
+        </div>    
+      </div>    
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="container mt-3">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-9">
+      <div class="card shadow mb-4">
+        <div class="card-body main-body">
+            <div class="row mb-3">
+              <div class="col-12 col-md-7 page-title">
+                <h2>List of Documents</h2>
+              </div>
+              <div class="col-12 col-md-3">
+                <div class="dropdown">
+                  <a class="btn btn-primary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Filter Document Type:
+                  </a>
+                  <ul class="dropdown-menu">
+                    {% for type in types %}
+                    <li><a class="dropdown-item" href="#">{{ type.text }}</a></li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+              <div class="col-12 col-md-2 text-md-end title-btn mt-1 mt-md-0">
+                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#upload-document-modal">
+                  <i class="bi bi-upload"></i> Upload
+                </button>
+              </div>
+            </div>
+            
+            <hr style="margin: 0;">
+            <div class="row mt-3">
+              <div class="d-none d-md-block col-md-1">
+                <!-- Favoite Indicator -->
+              </div>
+              <div class="d-none d-md-block col-md-3">
+                <h5>Date</h5>
+              </div>
+              <div class="col-6 d-md-block col-md-5">
+                <h5>From</h5>
+              </div>
+              <div class="col-6 d-md-block col-md-3 text-center">
+                <!-- Summary information -->
+              </div>
+            </div>
+            <hr style="margin: 0;">
+            {% for document in object_list %}
+              {% render_document_list_item document template=document.type.list_template %}
+            <hr>
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Pagination -->
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-9">
+      <nav>
+        <ul class="pagination justify-content-center pagination-sm">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {% endif %}
+          <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Form - Upload Document -->
+<div class="modal fade" tabindex="-1" role="dialog" id="upload-document-modal" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form method="post" enctype="multipart/form-data" id="upload-form" action="{% url 'core:documents' %}">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="upload-document-label">Upload Document</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body mb-3 mx-3">
+          <div class="row mt-3">
+            <label for="document-type" class="form-label">Document Type</label>
+            <select class="form-select" aria-label="Select document type" id="document-type" name="document_type">
+              {% for type in types %}
+              <option value="{{ type.short_code }}">{{ type.text }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="row mt-3">
+            <label for="upload-file" class="form-label">Document Image</label>
+            <input class="form-control upload-file" type="file" id="upload-file" name="upload_file">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x"></i> Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" id="upload-document-btn">
+            <i class="bi bi-upload"></i> Upload
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="blocking-spinner hidden">
+  <span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+<script type="text/javascript">
+  const blockingSpinner = $(".blocking-spinner");
+  const mainBodyElement = $('.main-body');
+  const uploadForm = $("#upload-form");
+  
+  $(document).ready(function () {
+    blockingSpinner.hide();
+  });
+
+  // Bind event to upload file button
+  $("#upload-document-btn").on("click", function (event) {
+    event.preventDefault();
+    closeModal();
+    blockingSpinner.show(); // Display blocking spinner
+    uploadForm.submit();
+  });
+</script>
+{% endblock javascript %}

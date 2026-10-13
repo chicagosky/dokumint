@@ -1,0 +1,13 @@
+<div class="row mt-3">
+    <div class="col-12 text-center">
+        {% if signup == "Y" %}
+        <p>Don't have an account yet? <a href="{% url 'account_signup' %}">Sign Up</a></p>
+        {% endif %}
+        {% if forgot == "Y" %}
+        <p><a href="{% url 'account_reset_password' %}">Forgot Password</a></p>
+        {% endif %}
+        {% if login == "Y" %}
+        <p>Already have an account? <a href="{% url 'account_login' %}">Log In</a></p>
+        {% endif %}
+    </div>
+</div>

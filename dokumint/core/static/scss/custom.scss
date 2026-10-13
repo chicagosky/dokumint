@@ -1,0 +1,26 @@
+/* dokumint colors */
+$primary: #0C3D7B;
+$secondary: #0077B6;
+$success: #206007;
+$warning: #9B5F15;
+$info: #343A40;
+$danger: #6A040F;
+
+/* dokumint font */
+@font-face {
+    font-family: "Nunito Sans Regular";
+    src: url("../font/NunitoSans_10pt-Regular.ttf");
+}
+
+@font-face {
+    font-family: "Nunito Sans Light";
+    src: url("../font/NunitoSans_10pt-Light.ttf");
+}
+
+$font-family-sans-serif: "Nunito Sans Regular", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !default;
+$font-family-serif:      "Nunito Sans Regular", Georgia, "Times New Roman", Times, serif !default;
+$font-family-monospace:  Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !default;
+$font-family-base:       $font-family-sans-serif !default;
+
+
+@import "../node_modules/bootstrap/scss/bootstrap";

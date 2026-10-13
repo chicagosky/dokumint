@@ -1,0 +1,20 @@
+{
+  "DocumentMetadata": {
+    "Pages": 1
+  },
+  "ExpenseDocuments": [
+    {
+      "SummaryFields": [
+        {
+          "Type": { "Text": "VENDOR_NAME" },
+          "ValueDetection": { "Text": "Example Market" }
+        },
+        {
+          "Type": { "Text": "TOTAL" },
+          "ValueDetection": { "Text": "12.34" }
+        }
+      ],
+      "LineItemGroups": []
+    }
+  ]
+}
